@@ -1,0 +1,25 @@
+<!-- Inherits from layout.html -->
+{% extends "layout.html" %}
+<!-- The block content replace the one encapsulated in layout.html -->
+{% block content %}
+<!-- Create large responsive container with two columns -->
+<div class="container-fluid">
+    <!-- Divide the container into two columns -->
+    <div class = 'row index'>
+        <div class = 'col-sm-12 col-md-12 col-lg-6 my-auto'>
+            <h2 class = 'align-middle index-title'>Image.io</h2>
+            <p class = 'align-middle index-p my-3'>Image.io is an AI-powered image classification web application that accurately identifies a object within an image</p>
+            <!-- Add a button to the prediction page -->
+            {% if current_user.is_authenticated %}
+                <a href="/predict" class="btn btn-primary">Predict</a>
+            {% else %}
+                <a class="btn btn-primary" href="/register">Register</a>
+                <a href="/login" class="btn btn-success">Login</a>
+            {% endif %}
+        </div>
+        <div class = 'col-sm-12 col-md-12 col-lg-6'>
+            <img src = '{{ url_for('static', filename='images/robot.png') }}' class = 'img-fluid heart-img' alt = 'stroke'>
+        </div>
+    </div>
+</div>
+{% endblock %}

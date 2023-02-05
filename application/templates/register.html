@@ -1,0 +1,46 @@
+    <!--Create Register.html-->
+    {% extends "layout.html" %}
+    <!-- Create a small container  -->
+    {% block content %}
+    <div class = 'container register-container my-4'>
+        <div class = 'row'>
+            <div class = 'col-md-6 offset-md-3'>
+                <form name="frmRegister" action="/register" method="post" novalidate>
+                    <fieldset class="form-group">
+                        <legend><u></u>{{title}}</u></legend>
+                        {{ form.hidden_tag() }}
+                        <p>
+                            {{ form.username.label }}
+                            <br>
+                            {{ form.username(class_='form-control') }}
+                            {% for error in form.username.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </p>
+                        <p>
+                            {{ form.password.label }}
+                            <br>
+                            {{ form.password(class_='form-control') }}
+                            {% for error in form.password.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </p>
+                        <p>
+                            {{ form.confirm_password.label }}
+                            <br>
+                            {{ form.confirm_password(class_='form-control') }}
+                            {% for error in form.confirm_password.errors %}
+                                <span class="error-message">{{ error }}</span>
+                            {% endfor %}
+                        </p>
+                        <p>
+                            {{ form.submit(class_='btn btn-primary') }}
+                        </p>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    
+    
