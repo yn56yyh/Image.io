@@ -1,0 +1,92 @@
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+/* Navbar Styling */
+nav {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 20px;
+}
+
+.nav-logo{
+    font-size: 30px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.nav-link {
+    text-decoration: none;
+    font-size: 17.5px;
+}
+
+
+/* Index Page  */
+.index {
+    font-family: 'Libre Franklin', sans-serif;
+}
+
+.index-title {
+    font-size: 50px;
+    font-weight: 600;
+    text-decoration: underline;
+    color: #735960;
+}
+
+.heart-img {
+    width: 85%;
+    height: auto;
+}
+
+/* Footer Page */
+.footer {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 12px;
+    text-align: center;
+    color: #735960;
+    background-color: #D8E2DC;
+}
+
+
+/* Prediction */
+.pred_container {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 20px;
+    text-align: center;
+    color: #735960;
+    background-color: #FFFFFF;
+    /* Make the Prediction container stand out from the rest of the page */
+    border: 1px solid #D8E2DC;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.error-message {
+    font-size: 15px;
+    color: #E07A5F;
+}
+
+.submit-btn {
+    font-size: 20px;
+    font-weight: 600;
+    background-color: #D8E2DC;
+    border: 1px solid #D8E2DC;
+    border-radius: 10px;
+}
+
+/* Dashboard  */
+td, th {
+    text-align: center;
+}
+
+/* Register Page  */
+.register-container {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 20px;
+    text-align: center;
+    color: #735960;
+    background-color: #FFFFFF;
+    border: 1px solid #D8E2DC;
+    border-radius: 10px;
+    padding: 20px;
+}

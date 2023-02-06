@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Image.io</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/main.css')}}" />
+  </head>
+  <body>
+    <div class="container-fluid"> {% include "includes/nav.html" %} {% with messages = get_flashed_messages(with_categories=true)%} {% if messages %} {% for category, message in messages %} <div class="alert alert-{{category}} text-center">
+        <p>{{ message }}</p>
+      </div> {% endfor %} {% endif %} {% endwith %}
+      {% block content %} {% endblock %} </div> {% include "includes/footer.html" %}
+  </body>
+</html>
