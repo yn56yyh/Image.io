@@ -36,13 +36,10 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 
-class UploadFileForm(FlaskForm):
-    file = FileField('File', validators = [InputRequired(message = 'Upload Image File!')])
-    submit = SubmitField('Upload Image')
-
 class PredictionForm(FlaskForm):
-    model1_predict = SubmitField('Predict with Model 1')
-    model2_predict = SubmitField('Predict with Model 2')
+    file = FileField('File', validators = [InputRequired(message = 'Upload Image File!')])
+    Model_selection = SelectField(u'Choose a Model: ', validators = [InputRequired (message = 'Please choose a model!')], choices=[(0, 'NathanNet-v1'), (1, 'NathanNet-v2')])
+    predict = SubmitField('Upload and Predict')
 
     
 

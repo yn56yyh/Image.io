@@ -4,8 +4,9 @@ from flask_login import UserMixin
 class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement = True)
     image_url = db.Column(db.String(100), nullable=False)
-    model = db.Column(db.String(20), nullable = False)
+    model_selection = db.Column(db.String(20), nullable = False)
     pred = db.Column(db.String(20), nullable = False)
+    conf_pct = db.Column(db.String(20))
 
 
 @login_manager.user_loader

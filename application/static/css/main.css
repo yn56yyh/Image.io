@@ -67,6 +67,14 @@ nav {
     padding: 20px;
 }
 
+.model-select {
+    width: 55%;
+    display: block;
+  margin: 0 auto;
+  text-align: center;
+  font-family: 'Libre Franklin', sans-serif;
+}
+
 .error-message {
     font-size: 15px;
     color: #E07A5F;
