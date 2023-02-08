@@ -1,0 +1,80 @@
+<!-- Inherits from layout.html --> {% extends "layout.html" %}
+<!-- Create a bootstrap table with the following columns:
+Gender, Age, Hypertension, Heart Disease, Ever Married, Work Type, Residence Type, Avg Glucose Level, BMI, Smoking Status, Stroke, Prediction Date --> {% block content %} <div class='container'>
+    
+    <table class='table table-striped'>
+        <thead>
+          <tr>
+            <th>Gender</th>
+            <th>Age</th>
+            <th>Hypertension Status</th>
+            <th>Heart Disease Status</th>
+            <th>Marital Status</th>
+            <th>Type of Work</th>
+            <th>Type of Residence</th>
+            <th>Average Glucose Level</th>
+            <th>BMI</th>
+            <th>Smoking Status</th>
+            <th>Prediction</th>
+            <th>Prediction Date</th>
+            <th>Modify Entry</th>
+          </tr>
+        </thead>
+        <tbody> {% for entry in entries.items %} <tr>
+            <td>{{ Gender[entry.gender] }}</td>
+            <td>{{ entry.age }}</td>
+            <td>{{ Hypertension[entry.hypertension] }}</td>
+            <td>{{ Heart_Disease[entry.heart_disease] }}</td>
+            <td>{{ Ever_Married[entry.ever_married] }}</td>
+            <td>{{ Work_Type[entry.work_type] }}</td>
+            <td>{{ Residence_Type[entry.residence_type] }}</td>
+            <td>{{ entry.avg_glucose_level }}</td>
+            <td>{{ entry.bmi }}</td>
+            <td>{{ Smoking_Status[entry.smoking_status] }}</td>
+            <td>{{ Stroke[entry.stroke] }}</td>
+            <td>{{ entry.predicted_dt.strftime("%d %b %y %H:%M") }}</td>
+            <td>
+              <form name='RemoveEntry' action='/remove/{{ entry.id }}' method='post' novalidate>
+                <input type='hidden' name='id' value='{{ entry.id }}'>
+                <button type='submit' class='btn btn-danger my-2'>Remove</button>
+              </form>
+            </td>
+          </tr> {% endfor %} </tbody>
+      </table>
+    <!-- Pagination Links-->
+    <div class="text-right">
+      <a href="{{ url_for('dashboard_page', page=entries.prev_num) }}"
+         class="btn btn-outline-dark 
+         {% if entries.page == 1 %}disabled{% endif %}">
+          &laquo;
+      </a>
+    <!-- Loop through the number of pages to display a link for each-->
+      {% for page_num in entries.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page_num %}
+    <!-- Check for the active page and set the link to "Active"-->
+              {% if entries.page == page_num %}
+              <a href="{{ url_for('dashboard_page', page=page_num) }}"
+                 class="btn btn-dark">
+                  {{ page_num }}
+              </a>
+              {% else %}
+              <a href="{{ url_for('dashboard_page', page=page_num) }}"
+                 class="btn btn-outline-dark">
+                  {{ page_num }}
+              </a>
+              {% endif %}
+          {% else %}
+              ...
+          {% endif %}
+      {% endfor %}
+      <a href="{{ url_for('dashboard_page', page=entries.next_num) }}"
+         class="btn btn-outline-dark 
+         {% if entries.page == entries.pages %}disabled{% endif %}">
+          &raquo;
+      </a>
+    </div>
+    <p class="text-right mt-3">
+     Showing page {{ entries.page }} of {{ entries.pages }}
+    </p>
+    </div> {% endblock %}
+  

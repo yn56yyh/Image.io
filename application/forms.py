@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import FloatField, SubmitField, SelectField, StringField, PasswordField, BooleanField
+from wtforms import FloatField, SubmitField, SelectField, StringField, PasswordField, BooleanField, FileField
 from wtforms.validators import Length, InputRequired, ValidationError, NumberRange, EqualTo, Regexp
 from application.models import User
+from werkzeug.utils import secure_filename
+import os
 
 
 class RegistrationForm(FlaskForm):
@@ -32,3 +34,18 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[InputRequired(message = 'Please enter password!'), Length(min=4, max=80)])
     rememberme = BooleanField('Remember Me')
     submit = SubmitField('Login')
+
+
+class UploadFileForm(FlaskForm):
+    file = FileField('File', validators = [InputRequired(message = 'Upload Image File!')])
+    submit = SubmitField('Upload Image')
+
+class PredictionForm(FlaskForm):
+    model1_predict = SubmitField('Predict with Model 1')
+    model2_predict = SubmitField('Predict with Model 2')
+
+    
+
+
+
+
