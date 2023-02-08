@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container-fluid d-flex" style="border-radius: 25px 0 0 25px;">
+    <div class="p-2 w-50 text-center" style="overflow: hidden;">
+        <img src="{{url_for('static', filename=img) }}">
+    </div>
+    <div class="p-2 w-50">
+        <h3>Our Model predicted that this image is:</h3>
+        <h3>a {{ result }} with {{ mod_conf }}% confidence!</h3>
+    </div>
+</div>
+{% endblock %}

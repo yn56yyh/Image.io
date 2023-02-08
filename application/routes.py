@@ -1,7 +1,7 @@
 from application import app, bcrypt, db
 from flask import render_template, request, flash, redirect, url_for, jsonify
 from application.models import User, Entry
-from application.forms import UploadFileForm, PredictionForm
+from application.forms import PredictionForm
 from flask_login import login_user, current_user, logout_user
 from werkzeug.utils import secure_filename
 from flask_cors import CORS, cross_origin
@@ -104,33 +104,42 @@ def logout():
 #Handles http://127.0.0.1:5000/predict
 @app.route('/predict', methods=['GET', 'POST'])
 def upload_page():
-    form = UploadFileForm()
-    predict_form = PredictionForm()
+    form = PredictionForm()
     if form.validate_on_submit():
-        print ('Submit Button Clicked!')
         file = form.file.data
+        choice = form.Model_selection.data
+        if int(choice) == 0:
+            db_choice = 'NathanNet-v1'
+        elif int(choice) == 1:
+            db_choice = 'NathanNet-v2'
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S_") + filename
             file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], filename))
             file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], filename)
-            print ('Image Uploaded!')
-            output = predict(file_path, 'https://ca2-model-j26f.onrender.com/v1/models/img_classifier:predict') 
-            # Run Prediction
-            # if 'model1_predict' in request.form:
-            #     output = predict(filename, 'https://ca2-model-j26f.onrender.com/v1/models/img_classifier')
-            # elif 'model2_predict' in request.form:
-            #     output = predict(filename, 'https://ca2-model2.onrender.com/v1/models/img_classifier')
-            print (output)
-            # Add to Database (Not Complete)
-            # return render_template('results.html', output = output)
+            output, index = predict(file_path, choice)
+            index = index[0]
+            conf_pct1 = max(index)
+            # Add to Database 
+            # insert_db = Entry(
+            #     image_url = file_path,
+            #     model_selection = db_choice ,
+            #     pred = output,
+            #     conf_pct = conf_pct1
+            # )
+            # db.session.add(insert_db)
+            # db.session.commit()
+            filename = 'upload/'+filename
+            return render_template('Results.html', mod_conf = round(conf_pct1*100,2), result = output, img = filename)
+
+
         else:
             flash('Error: Unsupported file type.')
+    
     if current_user.is_authenticated == False:
         return redirect(url_for('index_page'))
-    return render_template('Upload.html', index = True, form = form, pred = predict_form)
-
-
+    return render_template('Upload.html', index = True, pred = form)
+   
 def make_prediction(instances, url):
     data = json.dumps({"signature_name": "serving_default", "instances":
     instances.tolist()})
@@ -140,19 +149,23 @@ def make_prediction(instances, url):
     return predictions 
 
 
-def predict(filename, url):
+def predict(filename, choice):
+    print ('enter predict')
     # Decoding and pre-processing image
     img = image.img_to_array(image.load_img(filename, target_size=(32, 32))) / 255.
     # reshape data to have 3 channels
     img = img.reshape(1, 32, 32, 3)
-    predictions = make_prediction(img, url)
+    if int(choice) == 0:
+        predictions = make_prediction(img, 'https://ca2-model-1.onrender.com/v1/models/img_classifier:predict')
+    elif int(choice) == 1:
+        predictions = make_prediction(img, 'https://ca2-model-1.onrender.com/v1/models/img_classifier:predict')
     ret = ""
+    class_labels = ['Airplane', 'Car', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     for i, pred in enumerate(predictions):
-        confidence = "{}".format(np.argmax(pred))
-        ret = "{}".format(np.argmax(pred), axis = -1)
-        response = ret
-    print (confidence)
-    return response
+        index = np.argmax(pred)
+        response = class_labels[index]
+        ret = "{}".format(response)
+    return ret, predictions
 
 
 
