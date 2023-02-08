@@ -24,6 +24,7 @@ app.config.from_pyfile('config.cfg')
 db_path = os.path.join(os.path.dirname(__file__), 'database.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}'.format(db_path)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = 'static/upload'
 
 with app.app_context():
     db.init_app(app)

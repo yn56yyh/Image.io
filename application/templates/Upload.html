@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container-fluid text-center" style = 'padding-top: 25px;'>
+  <div class="row">
+    <div class="col-sm-12">
+      <div style="background-color: #c8b6ff; border-radius: 25px; padding-top: 25px; box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; width: 50%; margin: 100px auto; padding-bottom: 50px;">
+        <h3 style="padding-bottom: 10px; text-align: center; color: #000000; font-weight: 450; font-family: 'Libre Franklin', sans-serif;"><u><b>Upload Image for Prediction</b></u></h3>
+        <div class="upload-section">
+          <div style="background-color: #b8c0ff; border-radius: 25px; border: dashed #000000; width: 500px; height: 200px; margin: 0 auto; display: flex; align-items: center; justify-content: center;">
+            <form method='POST' enctype='multipart/form-data' class = 'Upload_Form'>
+              <div style="text-align-last: center; margin: auto;">
+                {{ form.hidden_tag() }}
+                {{ form.file() }}
+              </div>
+              <div style="text-align: center; padding-top: 20px;">
+                {{ form.submit }}
+              </div>
+            </form>
+          </div>
+        </div>
+        <form method='POST' enctype='multipart/form-data'>
+          <br><br>
+          {{ pred.model1_predict (class ='button-23')}}
+          <br><br>
+          {{ pred.model2_predict (class = 'button-23')}}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
