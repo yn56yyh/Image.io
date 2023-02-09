@@ -130,7 +130,7 @@ def upload_page():
             # db.session.add(insert_db)
             # db.session.commit()
             filename = 'upload/'+filename
-            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename))
+            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename, choice = db_choice))
         else:
             flash('Error: Unsupported file type.')
     
@@ -171,9 +171,10 @@ def results_page():
     mod_conf = request.args.get('mod_conf')
     result = request.args.get('result')
     img = request.args.get('img')
-    if not mod_conf or not result or not img:
+    choice = request.args.get('choice')
+    if not mod_conf or not result or not img or not choice:
         return redirect(url_for('upload_page'))
-    return render_template('Results.html', mod_conf=mod_conf, result=result, img=img)
+    return render_template('Results.html', mod_conf=mod_conf, result=result, img=img, choice = choice)
 
 
 
