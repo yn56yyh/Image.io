@@ -1,12 +1,13 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container-fluid d-flex" style="border-radius: 25px 0 0 25px;">
-    <div class="p-2 w-50 text-center" style="overflow: hidden;">
-        <img src="{{url_for('static', filename=img) }}">
+
+<div class="container-fluid mt-5 mb-5 p-5 d-flex align-items-center" style="border-radius: 25px; box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;">
+    <div class="p-2 w-50 text-center" style="overflow: hidden; border-radius: 25px;">
+        <img src="{{url_for('static', filename=img) }}" style="width: 75%; height: auto; border-radius: 25px;">
     </div>
-    <div class="p-2 w-50">
-        <h3>Our Model predicted that this image is:</h3>
-        <h3>a {{ result }} with {{ mod_conf }}% confidence!</h3>
+    <div class="p-2 w-50 d-flex flex-column justify-content-center">
+        <h3 class="text-center" style="font-family: 'Libre Franklin', sans-serif;"><u>Our Model predicted that this image is:</u></h3>
+        <h4 class="text-center" style="font-family: 'Libre Franklin', sans-serif;">a <b>{{ result }}</b> with <b>{{ mod_conf }}%</b> confidence!</h3>
     </div>
 </div>
 {% endblock %}

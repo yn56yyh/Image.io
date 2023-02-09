@@ -130,9 +130,7 @@ def upload_page():
             # db.session.add(insert_db)
             # db.session.commit()
             filename = 'upload/'+filename
-            return render_template('Results.html', mod_conf = round(conf_pct1*100,2), result = output, img = filename)
-
-
+            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename))
         else:
             flash('Error: Unsupported file type.')
     
@@ -166,6 +164,17 @@ def predict(filename, choice):
         response = class_labels[index]
         ret = "{}".format(response)
     return ret, predictions
+
+## Result Page ##
+@app.route('/results')
+def results_page():
+    mod_conf = request.args.get('mod_conf')
+    result = request.args.get('result')
+    img = request.args.get('img')
+    if not mod_conf or not result or not img:
+        return redirect(url_for('upload_page'))
+    return render_template('Results.html', mod_conf=mod_conf, result=result, img=img)
+
 
 
 
