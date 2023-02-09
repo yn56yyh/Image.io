@@ -3,10 +3,11 @@ from flask_login import UserMixin
 
 class Entry(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement = True)
-    image_url = db.Column(db.String(100), nullable=False)
+    image_url = db.Column(db.String(500), nullable=False)
     model_selection = db.Column(db.String(20), nullable = False)
     pred = db.Column(db.String(20), nullable = False)
-    conf_pct = db.Column(db.String(20))
+    pred_dt = db.Column(db.DateTime, nullable = False)
+    conf_pct = db.Column(db.Float, nullable=False)
 
 
 @login_manager.user_loader
