@@ -78,6 +78,8 @@ def dashboard_page():
     # Set the pagination config
     page = request.args.get("page", 1, type=int)
     entries = Entry.query.paginate(page=page, per_page=ROWS_PER_PAGE)
+    if len(entries.items) == 0:
+        return redirect(url_for("index_page"))
     return render_template(
         "dashboard.html",
         entries=entries,
@@ -149,7 +151,8 @@ def upload_page():
             filename = 'upload/'+filename
             return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename, choice = db_choice))
         else:
-            flash('Error: Unsupported file type.')
+           error = flash('Error: Unsupported file type.', 'danger')
+           return render_template('Upload.html', index = True, pred = form)
     
     if current_user.is_authenticated == False:
         return redirect(url_for('index_page'))
