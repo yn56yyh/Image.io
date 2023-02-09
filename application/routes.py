@@ -8,7 +8,7 @@ from flask_cors import CORS, cross_origin
 from tensorflow.keras.preprocessing import image
 from PIL import Image, ImageOps
 import numpy as np
-import tensorflow.keras.models
+from datetime import datetime
 import re
 import base64
 from io import BytesIO
@@ -78,19 +78,37 @@ def dashboard_page():
     # Set the pagination config
     page = request.args.get("page", 1, type=int)
     entries = Entry.query.paginate(page=page, per_page=ROWS_PER_PAGE)
-    # Create a variable to generate the number of times the loop will run
+    if len(entries.items) == 0:
+        return redirect(url_for("index_page"))
     return render_template(
         "dashboard.html",
         entries=entries,
-        Gender=Gender,
-        Hypertension=Hypertension,
-        Heart_Disease=Heart_Disease,
-        Ever_Married=Ever_Married,
-        Work_Type=Work_Type,
-        Residence_Type=Residence_Type,
-        Smoking_Status=Smoking_Status,
-        Stroke=Stroke,
 )
+
+## Search Function for Dashboard PAge
+@app.route('/search', methods=['POST'])
+def search():
+    search_term = request.form.get('search_term')
+    # Perform search and get results
+    entries = perform_search(search_term)
+    print (entries)
+#     return render_template(
+#         "dashboard.html",
+#         entries=entries,
+# )
+
+def perform_search(search_term):
+    results = Entry.query.filter(
+        db.or_(
+            Entry.image_url.ilike(f'%{search_term}%'),
+            Entry.model_selection.ilike(f'%{search_term}%'),
+            Entry.pred.ilike(f'%{search_term}%'),
+            Entry.pred_dt.ilike(f'%{search_term}%'),
+            Entry.conf_pct.ilike(f'%{search_term}%'),
+        )
+    ).all()
+    
+    return results
 
 
 ## Logout Page ##
@@ -114,25 +132,27 @@ def upload_page():
             db_choice = 'NathanNet-v2'
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S_") + filename
+            filename = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S_") + filename 
             file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], filename))
             file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], filename)
             output, index = predict(file_path, choice)
             index = index[0]
             conf_pct1 = max(index)
             # Add to Database 
-            # insert_db = Entry(
-            #     image_url = file_path,
-            #     model_selection = db_choice ,
-            #     pred = output,
-            #     conf_pct = conf_pct1
-            # )
-            # db.session.add(insert_db)
-            # db.session.commit()
+            insert_db = Entry(
+                image_url = filename,
+                model_selection = db_choice,
+                pred = output,
+                conf_pct = conf_pct1,
+                pred_dt = datetime.datetime.now()
+            )
+            result = add_entry(insert_db)
+            print ('Added to Database', result)
             filename = 'upload/'+filename
             return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename, choice = db_choice))
         else:
-            flash('Error: Unsupported file type.')
+           error = flash('Error: Unsupported file type.', 'danger')
+           return render_template('Upload.html', index = True, pred = form)
     
     if current_user.is_authenticated == False:
         return redirect(url_for('index_page'))
@@ -191,5 +211,35 @@ def internal_server_error(e):
 @app.errorhandler(403)
 def forbidden(e):
     return render_template("403.html"), 403
+
+
+## Adding Entry ##
+def add_entry(new_entry):
+    try:
+        db.session.add(new_entry)
+        db.session.commit()
+        return new_entry.id
+
+    except Exception as error:
+        db.session.rollback()
+        flash (f'Error: {error}', 'danger')
+
+## Removing Entry ##
+def remove_entry(id):
+    try:
+        entry = db.get_or_404(Entry, id)
+        db.session.delete(entry)
+        db.session.commit()
+    except Exception as error: 
+        db.session.rollback()
+        flash(f"Error: {error}", "danger")
+        return error
+
+
+@app.route('/remove/<id>', methods = ['POST'])
+def remove(id):
+    remove_entry(id)
+    return redirect(url_for('dashboard_page'))
+
 
 
