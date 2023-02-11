@@ -34,7 +34,8 @@ def allowed_file(filename):
 @app.route('/index')
 @app.route('/home')
 def index_page():
-    return render_template('index.html')
+    entry_count = Entry.query.count()
+    return render_template("index.html", entry_count=entry_count)
 
 ## Login Page ##
 @app.route('/login', methods=['GET','POST'])
@@ -73,6 +74,7 @@ def register():
 ROWS_PER_PAGE = 8
 @app.route("/dashboard")
 def dashboard_page():
+    entry_count = Entry.query.count()
     if current_user.is_authenticated == False:
         return redirect(url_for("index_page"))
     # Set the pagination config
@@ -83,22 +85,27 @@ def dashboard_page():
     return render_template(
         "dashboard.html",
         entries=entries,
+        entry_count=entry_count
 )
 
-## Search Function for Dashboard PAge
-@app.route('/search', methods=['POST'])
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    search_term = request.form.get('search_term')
-    # Perform search and get results
-    entries = perform_search(search_term)
-    print (entries)
-#     return render_template(
-#         "dashboard.html",
-#         entries=entries,
-# )
+    if request.method == 'POST':
+        entry_count = Entry.query.count()
+        search_term = request.form.get('search_term')
+        # Perform search and get results2
+        entries = perform_search(search_term)
+        return render_template(
+            "dashboard.html",
+            entries=entries,
+            entry_count=entry_count
+        )
+    else:
+        return redirect(url_for("index_page"))
 
 def perform_search(search_term):
-    results = Entry.query.filter(
+    page = request.args.get("page", 1, type=int)
+    entries = Entry.query.filter(
         db.or_(
             Entry.image_url.ilike(f'%{search_term}%'),
             Entry.model_selection.ilike(f'%{search_term}%'),
@@ -106,9 +113,9 @@ def perform_search(search_term):
             Entry.pred_dt.ilike(f'%{search_term}%'),
             Entry.conf_pct.ilike(f'%{search_term}%'),
         )
-    ).all()
+    ).paginate(page=page, per_page=ROWS_PER_PAGE)
     
-    return results
+    return entries
 
 
 ## Logout Page ##
@@ -122,6 +129,7 @@ def logout():
 #Handles http://127.0.0.1:5000/predict
 @app.route('/predict', methods=['GET', 'POST'])
 def upload_page():
+    entry_count = Entry.query.count()
     form = PredictionForm()
     if form.validate_on_submit():
         file = form.file.data
@@ -143,20 +151,20 @@ def upload_page():
                 image_url = filename,
                 model_selection = db_choice,
                 pred = output,
-                conf_pct = conf_pct1,
+                conf_pct = round(conf_pct1,4),
                 pred_dt = datetime.datetime.now()
             )
             result = add_entry(insert_db)
             print ('Added to Database', result)
             filename = 'upload/'+filename
-            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename, choice = db_choice))
+            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,4), result=output, img=filename, choice = db_choice))
         else:
            error = flash('Error: Unsupported file type.', 'danger')
-           return render_template('Upload.html', index = True, pred = form)
+           return render_template('Upload.html', index = True, pred = form, entry_count = entry_count)
     
     if current_user.is_authenticated == False:
         return redirect(url_for('index_page'))
-    return render_template('Upload.html', index = True, pred = form)
+    return render_template('Upload.html', index = True, pred = form, entry_count = entry_count)
    
 def make_prediction(instances, url):
     data = json.dumps({"signature_name": "serving_default", "instances":
@@ -188,13 +196,14 @@ def predict(filename, choice):
 ## Result Page ##
 @app.route('/results')
 def results_page():
+    entry_count = Entry.query.count()
     mod_conf = request.args.get('mod_conf')
     result = request.args.get('result')
     img = request.args.get('img')
     choice = request.args.get('choice')
     if not mod_conf or not result or not img or not choice:
         return redirect(url_for('upload_page'))
-    return render_template('Results.html', mod_conf=mod_conf, result=result, img=img, choice = choice)
+    return render_template('Results.html', mod_conf=mod_conf, result=result, img=img, choice = choice, entry_count = entry_count)
 
 
 
@@ -202,15 +211,18 @@ def results_page():
 ## Error Handling Pages ##
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template("404.html"), 404
+    entry_count = Entry.query.count()
+    return render_template("404.html",entry_count=entry_count), 404
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template("500.html"), 500
+    entry_count = Entry.query.count()
+    return render_template("500.html",entry_count=entry_count), 500
 
 @app.errorhandler(403)
 def forbidden(e):
-    return render_template("403.html"), 403
+    entry_count = Entry.query.count()
+    return render_template("403.html",entry_count=entry_count), 403
 
 
 ## Adding Entry ##
@@ -235,11 +247,28 @@ def remove_entry(id):
         flash(f"Error: {error}", "danger")
         return error
 
-
 @app.route('/remove/<id>', methods = ['POST'])
 def remove(id):
     remove_entry(id)
     return redirect(url_for('dashboard_page'))
+
+## Viewing Entry ##
+def get_entry(id):
+    try:
+        entry = db.get_or_404(Entry, id)
+        return entry
+    except Exception as error:
+        db.session.rollback()
+        flash(f"Error: {error}", "danger")
+        return 0
+
+@app.route('/view/<id>', methods = ['GET'])
+def view(id):
+    entry = get_entry(id)
+    entry_count = Entry.query.count()
+    entry.image_url = 'upload/'+entry.image_url
+    return render_template('Results.html', mod_conf=entry.conf_pct, result=entry.pred, img=entry.image_url, choice = entry.model_selection, entry_count = entry_count)
+
 
 
 
