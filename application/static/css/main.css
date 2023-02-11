@@ -156,3 +156,21 @@ td, th {
   cursor: not-allowed;
   opacity: 1;
 }
+
+.sort-arrow {
+    float: right;
+    display: none;
+}
+
+.sorted {
+    display: inline-block !important;
+}
+
+.ascending .sort-arrow {
+    border-bottom: 5px solid #333;
+}
+
+.descending .sort-arrow {
+    border-top: 5px solid #333;
+}
+  
