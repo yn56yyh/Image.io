@@ -47,7 +47,9 @@ nav {
     background-color: #D8E2DC;
 }
 
-
+th, td, .search-input, .search-button {
+    font-family: 'Libre Franklin', sans-serif;
+}
 /* Prediction */
 .Upload_h3{
     font-family: 'Libre Franklin', sans-serif;
@@ -65,6 +67,10 @@ nav {
     border: 1px solid #D8E2DC;
     border-radius: 10px;
     padding: 20px;
+}
+
+.filter-1, .filter-2 {
+    font-family: 'Libre Franklin', sans-serif;
 }
 
 .model-select {
