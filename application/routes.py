@@ -82,6 +82,7 @@ def dashboard_page():
     entries = Entry.query.paginate(page=page, per_page=ROWS_PER_PAGE)
     if len(entries.items) == 0:
         return redirect(url_for("index_page"))
+    entries.mod_conf = entries
     return render_template(
         "dashboard.html",
         entries=entries,
@@ -185,19 +186,20 @@ def upload_page():
             file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], filename)
             output, index = predict(file_path, choice)
             index = index[0]
-            conf_pct1 = max(index)
+            conf_pct = max(index)
+            conf_pct = round(conf_pct,2) * 100
             # Add to Database 
             insert_db = Entry(
                 image_url = filename,
                 model_selection = db_choice,
                 pred = output,
-                conf_pct = round(conf_pct1,4),
+                conf_pct = conf_pct,
                 pred_dt = datetime.datetime.now()
             )
             result = add_entry(insert_db)
             print ('Added to Database', result)
             filename = 'upload/'+filename
-            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename, choice = db_choice))
+            return redirect(url_for('results_page', mod_conf=conf_pct, result=output, img=filename, choice = db_choice))
         else:
            error = flash('Error: Unsupported file type.', 'danger')
            return render_template('Upload.html', index = True, pred = form, entry_count = entry_count)
@@ -243,7 +245,7 @@ def results_page():
     choice = request.args.get('choice')
     if not mod_conf or not result or not img or not choice:
         return redirect(url_for('upload_page'))
-    return render_template('Results.html', mod_conf=mod_conf*100, result=result, img=img, choice = choice, entry_count = entry_count)
+    return render_template('Results.html', mod_conf=mod_conf, result=result, img=img, choice = choice, entry_count = entry_count)
 
 
 
