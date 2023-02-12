@@ -8,6 +8,9 @@
     <div class="p-2 w-50 d-flex flex-column justify-content-center">
         <h3 class="text-center" style="font-family: 'Libre Franklin', sans-serif;"><u>Our <b>{{ choice }}</b> Model predicted that this image is:</u></h3>
         <h4 class="text-center" style="font-family: 'Libre Franklin', sans-serif;">a <b>{{ result }}</b> with <b>{{ mod_conf }}%</b> confidence!</h3>
+            <form class='form-inline justify-content-center my-3' action='/home'>
+                <button class='btn btn-success mr-2 search-button ' type='submit'>Return Home</button>
+              </form>
     </div>
 </div>
 {% endblock %}

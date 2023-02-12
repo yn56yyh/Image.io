@@ -28,16 +28,16 @@ Gender, Age, Hypertension, Heart Disease, Ever Married, Work Type, Residence Typ
           <select class='form-control' id='predictionFilter' name='predictionFilter'>
             <option value='all'>All</option>
             <!-- Replace "cifar-10 classes" with the actual names of the classes -->
-            <option value='airplane'>Airplane</option>
-            <option value='automobile'>Automobile</option>
-            <option value='bird'>Bird</option>
+            <option value='Airplane'>Airplane</option>
+            <option value='Automobile'>Automobile</option>
+            <option value='Bird'>Bird</option>
             <option value='cat'>Cat</option>
-            <option value='deer'>Deer</option>
-            <option value='dog'>Dog</option>
-            <option value='frog'>Frog</option>
-            <option value='horse'>Horse</option>
-            <option value='ship'>Ship</option>
-            <option value='truck'>Truck</option>
+            <option value='Deer'>Deer</option>
+            <option value='Dog'>Dog</option>
+            <option value='Frog'>Frog</option>
+            <option value='Horse'>Horse</option>
+            <option value='Ship'>Ship</option>
+            <option value='Truck'>Truck</option>
           </select>
         </div>
       
@@ -89,12 +89,12 @@ Gender, Age, Hypertension, Heart Disease, Ever Married, Work Type, Residence Typ
     <!-- Check for the active page and set the link to "Active"-->
               {% if entries.page == page_num %}
               <a href="{{ url_for('dashboard_page', page=page_num) }}"
-                 class="btn btn-dark">
+                 class="btn btn-dark search-button">
                   {{ page_num }}
               </a>
               {% else %}
               <a href="{{ url_for('dashboard_page', page=page_num) }}"
-                 class="btn btn-outline-dark">
+                 class="btn btn-outline-dark search-button">
                   {{ page_num }}
               </a>
               {% endif %}
@@ -103,13 +103,13 @@ Gender, Age, Hypertension, Heart Disease, Ever Married, Work Type, Residence Typ
           {% endif %}
       {% endfor %}
       <a href="{{ url_for('dashboard_page', page=entries.next_num) }}"
-         class="btn btn-outline-dark 
+         class="btn btn-outline-dark search-button
          {% if entries.page == entries.pages %}disabled{% endif %}">
           &raquo;
       </a>
     </div>
-    <p class="text-right mt-3">
-     Showing page {{ entries.page }} of {{ entries.pages }}
+    <p class="text-right mt-3 search-button">
+     Showing Page {{ entries.page }} of {{ entries.pages }}
     </p>
     </div> {% endblock %}
   

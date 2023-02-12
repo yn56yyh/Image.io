@@ -71,7 +71,7 @@ def register():
 
 
 ## Dashboard Page ##
-ROWS_PER_PAGE = 8
+ROWS_PER_PAGE = 4
 @app.route("/dashboard")
 def dashboard_page():
     entry_count = Entry.query.count()
@@ -133,7 +133,7 @@ def filter():
             flash('No matching filters found!', 'info')
             entries = Entry.query.paginate(page=page, per_page=ROWS_PER_PAGE)
 
-        # Render the results on the template
+
         return render_template('dashboard.html', entries=entries, entry_count=entry_count)
 
     else:
@@ -197,7 +197,7 @@ def upload_page():
             result = add_entry(insert_db)
             print ('Added to Database', result)
             filename = 'upload/'+filename
-            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,4), result=output, img=filename, choice = db_choice))
+            return redirect(url_for('results_page', mod_conf=round(conf_pct1*100,2), result=output, img=filename, choice = db_choice))
         else:
            error = flash('Error: Unsupported file type.', 'danger')
            return render_template('Upload.html', index = True, pred = form, entry_count = entry_count)
@@ -226,7 +226,7 @@ def predict(filename, choice):
     elif int(choice) == 1:
         predictions = make_prediction(img, 'https://ca2-model-1.onrender.com/v1/models/img_classifier:predict')
     ret = ""
-    class_labels = ['Airplane', 'Car', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
+    class_labels = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
     for i, pred in enumerate(predictions):
         index = np.argmax(pred)
         response = class_labels[index]
