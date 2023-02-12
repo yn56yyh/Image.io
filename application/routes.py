@@ -243,7 +243,7 @@ def results_page():
     choice = request.args.get('choice')
     if not mod_conf or not result or not img or not choice:
         return redirect(url_for('upload_page'))
-    return render_template('Results.html', mod_conf=mod_conf, result=result, img=img, choice = choice, entry_count = entry_count)
+    return render_template('Results.html', mod_conf=mod_conf*100, result=result, img=img, choice = choice, entry_count = entry_count)
 
 
 
