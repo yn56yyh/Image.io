@@ -107,6 +107,7 @@ def perform_search(search_term):
     page = request.args.get("page", 1, type=int)
     entries = Entry.query.filter(
         db.or_(
+            Entry.id.ilike(f'%{search_term}%'),
             Entry.image_url.ilike(f'%{search_term}%'),
             Entry.model_selection.ilike(f'%{search_term}%'),
             Entry.pred.ilike(f'%{search_term}%'),
@@ -116,6 +117,45 @@ def perform_search(search_term):
     ).paginate(page=page, per_page=ROWS_PER_PAGE)
     
     return entries
+
+
+@app.route('/filter-results', methods=['GET', 'POST'])
+def filter():
+    page = request.args.get("page", 1, type=int)
+    entry_count = Entry.query.count()
+    if request.method == 'POST':
+        model_filter = request.form.get('modelFilter')
+        prediction_filter = request.form.get('predictionFilter')
+        # Use the filters to get the data from the database
+        entries = filter_db(model_filter, prediction_filter)
+
+        if len(entries.items) == 0:
+            flash('No matching filters found!', 'info')
+            entries = Entry.query.paginate(page=page, per_page=ROWS_PER_PAGE)
+
+        # Render the results on the template
+        return render_template('dashboard.html', entries=entries, entry_count=entry_count)
+
+    else:
+        return redirect(url_for("index_page"))
+
+
+
+def filter_db(model, prediction):
+    page = request.args.get("page", 1, type=int)
+    query = Entry.query
+    
+    if model != 'all':
+        query = query.filter(Entry.model_selection == model)
+    if prediction != 'all':
+        query = query.filter(Entry.pred == prediction)
+    
+    entries = query.paginate(page=page, per_page=ROWS_PER_PAGE)
+    
+    return entries
+
+    
+
 
 
 ## Logout Page ##

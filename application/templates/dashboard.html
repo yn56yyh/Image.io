@@ -2,13 +2,51 @@
 <!-- Create a bootstrap table with the following columns:
 Gender, Age, Hypertension, Heart Disease, Ever Married, Work Type, Residence Type, Avg Glucose Level, BMI, Smoking Status, Stroke, Prediction Date --> {% block content %} <div class='container'>
   
-  <div class='d-flex justify-content-between'>
+  <div class='d-flex justify-content-between my-4'>
     <form class='form-inline' action='/search' method='post'>
-      <input class='form-control mr-2' type='text' name='search_term' placeholder='Enter search term'>
-      <button class='btn btn-outline-primary' type='submit'>Search</button>
+      <input class='form-control mr-2 search-input' type='text' name='search_term' placeholder='Search Dashboard..'>
+      <button class='btn btn-outline-primary mr-2 search-button' type='submit'>Search</button>
+    </form>
+  
+    <form action='/filter-results' method='post'>
+      <div class='form-inline filter-1'>
+        <!-- Model Filter -->
+        <div class='form-group mr-2'>
+          <label for='modelFilter'><b>Model:</b></label>
+          &nbsp;&nbsp;
+          <select class='form-control' id='modelFilter' name='modelFilter'>
+            <option value='all'>All</option>
+            <option value='NathanNet-v1'>NathanNet-v1</option>
+            <option value='NathanNet-v2'>NathanNet-v2</option>
+          </select>
+        </div>
+      
+        <!-- Prediction Filter -->
+        <div class='form-group mr-2 filter-2'>
+          <label for='predictionFilter'><b>Prediction:</b></label>
+          &nbsp;&nbsp;
+          <select class='form-control' id='predictionFilter' name='predictionFilter'>
+            <option value='all'>All</option>
+            <!-- Replace "cifar-10 classes" with the actual names of the classes -->
+            <option value='airplane'>Airplane</option>
+            <option value='automobile'>Automobile</option>
+            <option value='bird'>Bird</option>
+            <option value='cat'>Cat</option>
+            <option value='deer'>Deer</option>
+            <option value='dog'>Dog</option>
+            <option value='frog'>Frog</option>
+            <option value='horse'>Horse</option>
+            <option value='ship'>Ship</option>
+            <option value='truck'>Truck</option>
+          </select>
+        </div>
+      
+        <button class='btn btn-outline-success filter-button' type='submit'>Filter</button>
+      </div>
     </form>
   </div>
-      
+  
+  
   <table class='table table-striped'>
         <thead>
           <tr>
