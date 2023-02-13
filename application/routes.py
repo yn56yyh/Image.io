@@ -89,26 +89,7 @@ def dashboard_page():
         entry_count=entry_count
 )
 
-@app.route('/search', methods=['GET', 'POST'])
-def search():
-    if request.method == 'POST':
-        entry_count = Entry.query.count()
-        search_term = request.form.get('search_term')
-        # Perform search and get results
-        entries = perform_search(search_term)
-        if len(entries.items) == 0 or search_term.strip() == '':
-            if search_term.strip() == '':
-                flash('Empty values are not allowed!', 'danger')
-            else:
-                flash("No results found for the search term '%s'" % search_term, 'danger')
-            return render_template("dashboard.html", entries=Entry.query.paginate(page=1, per_page=ROWS_PER_PAGE), entry_count=entry_count)
-        return render_template(
-            "dashboard.html",
-            entries=entries,
-            entry_count=entry_count
-        )
-    else:
-        return redirect(url_for("index_page"))
+
 
 def perform_search(search_term):
     page = request.args.get("page", 1, type=int)
@@ -224,7 +205,6 @@ def make_prediction(instances, url):
 
 
 def predict(filename, choice):
-    print ('enter predict')
     # Decoding and pre-processing image
     img = image.img_to_array(image.load_img(filename, target_size=(32, 32))) / 255.
     # reshape data to have 3 channels
@@ -318,5 +298,108 @@ def view(id):
     return render_template('Results.html', mod_conf=entry.conf_pct, result=entry.pred, img=entry.image_url, choice = entry.model_selection, entry_count = entry_count)
 
 
+
+
+
+## APIS FOR PYTEST
+# User APIS for Pytest
+
+# API 1
+@app.route("/api/user", methods=["POST"])
+def add_user_api():
+    data = request.get_json()
+    # Retrieve each field
+    Username = data['username']
+    pw = data['password']
+    pw = bcrypt.generate_password_hash(pw).decode('utf-8')
+    user = User(username=Username, password=pw)
+    result = add_entry(user)
+    # Add Entry to Database
+    return jsonify({"id": result})
+
+# API 2
+@app.route("/api/deleteu/<id>", methods=['GET'])
+def api_delete_user(id):
+    entry = remove_entry(int(id))
+    return jsonify({'result':'ok'})
+
+def remove_user(id):
+    try:
+        entry = db.get_or_404(User, id)
+        db.session.delete(entry)
+        db.session.commit()
+    except Exception as error: 
+        db.session.rollback()
+        flash(f"Error: {error}", "danger")
+        return error
+
+# API 3 
+@app.route('/api/getuser/<int:id>', methods=['GET'])
+def get_user_api(id):
+    entry = get_user(id)
+    data = {
+        'id': entry.id,
+        'username': entry.username,
+        'password': entry.password
+    }
+    return jsonify(data)
+
+def get_user(id):
+    try:
+        user = db.get_or_404(User, id)
+        return user
+    except Exception as error:
+        db.session.rollback()
+        flash(f"Error: {error}", "danger")
+        return 0
+
+# API 4
+# Login API Testing
+@app.route('/login_api', methods=['POST'])
+def login_api():
+    if request.method == 'POST':
+        data = request.get_json()
+        username = data['username']
+        password = data['password']
+        user = User.query.filter_by(username=username).first()
+        if user.id!=None:
+            return jsonify({'message': 'Login Successful', 'status': 'success'})
+        else:
+            return jsonify({'message': 'Login Unsuccessful. Please check username and password', 'status': 'failed'})
+
+
+# API 5
+# Adding Entry
+@app.route("/api/entry", methods=["POST"])
+def add_entry_api():
+    data = request.get_json()
+    # Retrieve each field
+    filename = data['filename']
+    model = data['model']
+    # Create Entry Object
+    file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'], filename)
+    output, index = predict(file_path, model)
+    index = index[0]
+    conf_pct = max(index)
+    conf_pct = round(conf_pct,2) * 100
+    # Add to Database 
+    entry = Entry(
+        image_url = filename,
+        model_selection = model,
+        pred = output,
+        conf_pct = conf_pct,
+        pred_dt = datetime.datetime.now()
+    )
+    # Add Entry to Database
+    result = add_entry(entry)
+    return jsonify({"id": result})
+
+
+# API 5
+# Deleting Entry
+@app.route("/api/deleteentry/<id>", methods=['GET'])
+def api_delete_entry(id):
+    entry = remove_entry(int(id))
+    return jsonify({'result':'ok'})
 
 
