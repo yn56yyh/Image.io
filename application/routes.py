@@ -221,6 +221,7 @@ def predict(filename, choice):
         ret = "{}".format(response)
     return ret, predictions
 
+
 ## Result Page ##
 @app.route('/results')
 def results_page():
