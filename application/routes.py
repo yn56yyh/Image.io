@@ -90,6 +90,28 @@ def dashboard_page():
 )
 
 
+@app.route('/search', methods=['GET', 'POST'])
+def search():
+    if request.method == 'POST':
+        entry_count = Entry.query.count()
+        search_term = request.form.get('search_term')
+        # Perform search and get results
+        entries = perform_search(search_term)
+        if len(entries.items) == 0 or search_term.strip() == '':
+            if search_term.strip() == '':
+                flash('Empty values are not allowed!', 'danger')
+            else:
+                flash("No results found for the search term '%s'" % search_term, 'danger')
+            return render_template("dashboard.html", entries=Entry.query.paginate(page=1, per_page=ROWS_PER_PAGE), entry_count=entry_count)
+        return render_template(
+            "dashboard.html",
+            entries=entries,
+            entry_count=entry_count
+        )
+    else:
+        return redirect(url_for("index_page"))
+
+
 
 def perform_search(search_term):
     page = request.args.get("page", 1, type=int)
